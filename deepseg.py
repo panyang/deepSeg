@@ -5,6 +5,7 @@ import numpy as np
 from util import read_json, get_widx
 from collections import OrderedDict
 
+
 #   U B L I
 # U
 # B
@@ -13,6 +14,7 @@ from collections import OrderedDict
 class DeepSeg(object):
 
     def __init__(self):
+
         self.VALID_TRANS = np.matrix([
             [1, 1, 0, 0],
             [0, 0, 1, 1],
@@ -25,12 +27,11 @@ class DeepSeg(object):
         model_params = read_json(model_fname)
         self.network = self.build_networks(model_params)
 
+    def weight_init_val(self, w_val):
 
-    def weight_init_val(self,w_val):
         return theano.shared(np.array(w_val).astype(theano.config.floatX))
 
-
-    def build_networks(self,pre_model_params):
+    def build_networks(self, pre_model_params):
 
         s_embed = np.array(pre_model_params['wb']['w_embed']).shape[1]
 
@@ -53,14 +54,16 @@ class DeepSeg(object):
 
         return func
 
-    def gen_input_line(self,line, s_window, pad_id):
+    def gen_input_line(self, line, s_window, pad_id):
+
         line_word = [pad_id] * (s_window / 2) + line + [pad_id] * (
             s_window / 2)
         case_raw = [line_word[i:i + s_window] for i in range(len(line_word) + 1 - s_window)]
+
         return case_raw
 
+    def viterbi(self, tag_prob):
 
-    def viterbi(self,tag_prob):
         max_prob = -np.inf * np.ones(tag_prob.shape)
         max_prob_bt = -1 * np.ones(tag_prob.shape)
         for i in range(tag_prob.shape[0]):
@@ -83,49 +86,54 @@ class DeepSeg(object):
         for i in range(1, max_prob.shape[0]):
             bt_seq.append(int(max_prob_bt[-i, bt_seq[-1]]))
         bt_seq.reverse()
+
         return bt_seq
 
+    def word_segmentation(self, input_line):
 
-    def word_segmentation(self,input_line):
         s_window = 5
         pad_id = len(self.word_dict) - 1
         output_line = []
+
         for line in input_line:
             line2 = filter(lambda x: len(x) > 0, [w.strip() for w in line])
             line_write = []
             for w in line2:
                 w_idx = get_widx(w, self.word_dict)
                 line_write.append(w_idx)
-            s = u""
             if len(line2) >= 1:
                 input_data = self.gen_input_line(line_write, s_window, pad_id)
                 tag_prob = self.network(input_data)
                 tag_result = self.viterbi(tag_prob[0])
+                temp_term = u""
                 for w, t in zip(line2, tag_result):
-                    s += w
+                    temp_term += w
                     if t == 0 or t == 2:
-                        s += u"  "
-            output_line.append(s)
+                        output_line.append(temp_term)
+                        temp_term = u""
+            output_line.append("\n")
+
         return output_line
 
-    def cut(self, line_in):
-        line_in_2 = line_in.split("\n")
-        results = self.word_segmentation(line_in_2)
-        return "\n".join(results)
+    def cut(self, doc_in):
 
+        line_in = doc_in.split("\n")
+        results = self.word_segmentation(line_in)
 
-
-line_in = u"""
-許多社區長青學苑多開設有書法、插花、土風舞班，
-文山區長青學苑則有個十分特別的「英文歌唱班」，
-成員年齡均超過六十歲，
-這群白髮蒼蒼，
-爺爺、奶奶級的學員唱起英文歌來字正腔圓，
-有模有樣。
-"""
+        return results
 
 
 if __name__ == '__main__':
-    ds = DeepSeg()
-    print ds.cut(line_in)
 
+    doc_in = u"""
+    許多社區長青學苑多開設有書法、插花、土風舞班，
+    文山區長青學苑則有個十分特別的「英文歌唱班」，
+    成員年齡均超過六十歲，
+    這群白髮蒼蒼，
+    爺爺、奶奶級的學員唱起英文歌來字正腔圓，
+    有模有樣。
+    """
+
+    ds = DeepSeg()
+    deep_seg_list = ds.cut(doc_in)
+    print("  ".join(deep_seg_list))
