@@ -3,6 +3,7 @@ import json
 import re
 import logging
 
+
 NUM_LIST = [
     u"０", u"１", u"２", u"３", u"４", u"５", u"６", u"７", u"８", u"９"
 ]
@@ -38,8 +39,6 @@ def read_json(json_fname):
     return json_item
 
 
-
-
 def tagDigitEn(w):
     if w.isdigit() or w in NUM_LIST:
         return u"$NUM$"
@@ -48,11 +47,10 @@ def tagDigitEn(w):
     else:
         return w
 
+
 def get_widx(w, word_dict):
     w_idx = word_dict.get(tagDigitEn(w), -1)
     if w_idx != -1:
         return w_idx
     else:
         return word_dict.get("OOV")
-
-
