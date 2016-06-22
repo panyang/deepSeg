@@ -1,30 +1,33 @@
 # -*- encoding:utf-8 -*-
 import theano.tensor as T
 import theano
+import os
 import numpy as np
-from util import read_json, get_widx
+from deepseg_util import read_json, get_widx
 from collections import OrderedDict
 from platform import python_version
 
-#   U B L I
-# U
-# B
-# L
-# I
+
 class DeepSeg(object):
 
     def __init__(self):
 
+        #   U B L I
+        # U
+        # B
+        # L
+        # I
         self.VALID_TRANS = np.matrix([
             [1, 1, 0, 0],
             [0, 0, 1, 1],
             [1, 1, 0, 0],
             [0, 0, 1, 1],
         ])
-        dict_fname = "as_dict.json"
-        self.word_dict = read_json(dict_fname)
-        model_fname = "as_model.json"
-        model_params = read_json(model_fname)
+
+        dict_path = os.path.normpath(os.path.join(os.getcwd(), "model/as_dict.json"))
+        self.word_dict = read_json(dict_path)
+        model_path = os.path.normpath(os.path.join(os.getcwd(), "model/as_model.json"))
+        model_params = read_json(model_path)
         self.network = self.build_networks(model_params)
 
     def weight_init_val(self, w_val):
@@ -121,19 +124,3 @@ class DeepSeg(object):
         results = self.word_segmentation(line_in)
 
         return results
-
-
-if __name__ == '__main__':
-
-    doc_in = u"""
-    許多社區長青學苑多開設有書法、插花、土風舞班，
-    文山區長青學苑則有個十分特別的「英文歌唱班」，
-    成員年齡均超過六十歲，
-    這群白髮蒼蒼，
-    爺爺、奶奶級的學員唱起英文歌來字正腔圓，
-    有模有樣。
-    """
-
-    ds = DeepSeg()
-    deep_seg_list = ds.cut(doc_in)
-    print("  ".join(deep_seg_list))
