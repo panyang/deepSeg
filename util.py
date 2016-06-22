@@ -24,7 +24,7 @@ def read_file_line(fname, toprint=False):
         line = f.readline()
         i += 1
         if toprint:
-            print i
+            print(i)
         if len(line) == 0:
             break
         yield line
@@ -43,7 +43,7 @@ def read_json(json_fname):
 def tagDigitEn(w):
     if w.isdigit() or w in NUM_LIST:
         return u"$NUM$"
-    elif len(re.findall(ur"[A-Za-z]", w)) > 0 or w in ENG_LIST:
+    elif len(re.findall(r"[A-Za-z]", w)) > 0 or w in ENG_LIST:
         return u"$EN$"
     else:
         return w
