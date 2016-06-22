@@ -43,7 +43,7 @@ def read_json(json_fname):
 def tagDigitEn(w):
     if w.isdigit() or w in NUM_LIST:
         return u"$NUM$"
-    elif len(re.findall(ur"[A-Za-z]", w)) > 0 or w in ENG_LIST:
+    elif len(re.findall(r"[A-Za-z]", w)) > 0 or w in ENG_LIST:
         return u"$EN$"
     else:
         return w

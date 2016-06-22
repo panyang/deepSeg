@@ -4,7 +4,7 @@ import theano
 import numpy as np
 from util import read_json, get_widx
 from collections import OrderedDict
-
+from platform import python_version
 
 #   U B L I
 # U
@@ -56,8 +56,8 @@ class DeepSeg(object):
 
     def gen_input_line(self, line, s_window, pad_id):
 
-        line_word = [pad_id] * (s_window / 2) + line + [pad_id] * (
-            s_window / 2)
+        line_word = [pad_id] * (s_window // 2) + line + [pad_id] * (
+            s_window // 2)
         case_raw = [line_word[i:i + s_window] for i in range(len(line_word) + 1 - s_window)]
 
         return case_raw
@@ -96,7 +96,7 @@ class DeepSeg(object):
         output_line = []
 
         for line in input_line:
-            line2 = filter(lambda x: len(x) > 0, [w.strip() for w in line])
+            line2 = [w.strip() for w in line if len(w.strip()) > 0]
             line_write = []
             for w in line2:
                 w_idx = get_widx(w, self.word_dict)
