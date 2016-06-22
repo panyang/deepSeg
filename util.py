@@ -24,7 +24,7 @@ def read_file_line(fname, toprint=False):
         line = f.readline()
         i += 1
         if toprint:
-            print i
+            print(i)
         if len(line) == 0:
             break
         yield line
