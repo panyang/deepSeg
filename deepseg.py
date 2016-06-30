@@ -28,22 +28,22 @@ class DeepSeg(object):
         self.word_dict = read_json(dict_path)
         model_path = os.path.normpath(os.path.join(os.getcwd(), "model/as_model.json"))
         model_params = read_json(model_path)
-        self.network = self.build_networks(model_params)
+        self.network = self.__build_networks(model_params)
 
-    def weight_init_val(self, w_val):
+    def __weight_init_val(self, w_val):
 
         return theano.shared(np.array(w_val).astype(theano.config.floatX))
 
-    def build_networks(self, pre_model_params):
+    def __build_networks(self, pre_model_params):
 
         s_embed = np.array(pre_model_params['wb']['w_embed']).shape[1]
 
         wb = OrderedDict()
-        wb['w_embed'] = self.weight_init_val(pre_model_params['wb']['w_embed'])
-        wb['w_hidden'] = self.weight_init_val(pre_model_params['wb']['w_hidden'])
-        wb['b_hidden'] = self.weight_init_val(pre_model_params['wb']['b_hidden'])
-        wb['w_out'] = self.weight_init_val(pre_model_params['wb']['w_out'])
-        wb['b_out'] = self.weight_init_val(pre_model_params['wb']['b_out'])
+        wb['w_embed'] = self.__weight_init_val(pre_model_params['wb']['w_embed'])
+        wb['w_hidden'] = self.__weight_init_val(pre_model_params['wb']['w_hidden'])
+        wb['b_hidden'] = self.__weight_init_val(pre_model_params['wb']['b_hidden'])
+        wb['w_out'] = self.__weight_init_val(pre_model_params['wb']['w_out'])
+        wb['b_out'] = self.__weight_init_val(pre_model_params['wb']['b_out'])
 
         x_in = T.imatrix()
 
@@ -57,7 +57,7 @@ class DeepSeg(object):
 
         return func
 
-    def gen_input_line(self, line, s_window, pad_id):
+    def __gen_input_line(self, line, s_window, pad_id):
 
         line_word = [pad_id] * (s_window // 2) + line + [pad_id] * (
             s_window // 2)
@@ -65,7 +65,7 @@ class DeepSeg(object):
 
         return case_raw
 
-    def viterbi(self, tag_prob):
+    def __viterbi(self, tag_prob):
 
         max_prob = -np.inf * np.ones(tag_prob.shape)
         max_prob_bt = -1 * np.ones(tag_prob.shape)
@@ -105,9 +105,9 @@ class DeepSeg(object):
                 w_idx = get_widx(w, self.word_dict)
                 line_write.append(w_idx)
             if len(line2) >= 1:
-                input_data = self.gen_input_line(line_write, s_window, pad_id)
+                input_data = self.__gen_input_line(line_write, s_window, pad_id)
                 tag_prob = self.network(input_data)
-                tag_result = self.viterbi(tag_prob[0])
+                tag_result = self.__viterbi(tag_prob[0])
                 temp_term = u""
                 for w, t in zip(line2, tag_result):
                     temp_term += w
