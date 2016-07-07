@@ -1,8 +1,13 @@
 # deepSeg
 
+[![Build Status](https://travis-ci.org/fukuball/deepSeg.svg?branch=master)](https://travis-ci.org/fukuball/deepSeg)
+[![codecov](https://codecov.io/gh/fukuball/deepSeg/branch/master/graph/badge.svg)](https://codecov.io/gh/fukuball/deepSeg)
+
 A deep learning Chinese Word Segmentation toolkit
 
 # Usage
+
+code example:
 
 ```
 # -*- encoding:utf-8 -*-
@@ -33,4 +38,18 @@ output:
   爺爺  、  奶奶級  的  學員  唱起  英文  歌  來  字正腔圓  ，
   有模有樣  。
 
+```
+
+# Run Tests
+
+```
+python -m unittest tests.test_deepseg.DeepsegTest
+python -m unittest tests.test_deepseg_util.DeepsegUtilTest
+```
+
+# Check PEP8
+
+```
+pep8 *.py --ignore=E501
+pep8 tests/*.py --ignore=E501
 ```
